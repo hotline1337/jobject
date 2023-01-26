@@ -15,7 +15,7 @@
 
 ## usage
 
-![](https://i.imgur.com/MKqY4XU.png)
+![](https://i.imgur.com/es7yUAq.png)
 
 ## contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
