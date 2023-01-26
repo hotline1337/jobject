@@ -1,7 +1,7 @@
 <p align="center">
-<h1 align="center">jobject</h1>
+<h1 align="center">JObject</h1>
 <p align="center">
-  <strong>jobject</strong> is a library integrating <strong>undocumented ntdll</strong> functions in order to prevent <strong>anti-debugging</strong>. By setting a limit for process memory usage that is less or equal to current memory usage, we can prevent the creation of threads and modification of executable memory.</strong>
+  <strong>JObject</strong> is a library integrating <strong>undocumented ntdll</strong> functions in order to prevent <strong>anti-debugging</strong>. By setting a limit for process memory usage that is less or equal to current memory usage, we can prevent the creation of threads and modification of executable memory.</strong>
 </p>
 </p>
 <p align="center">
@@ -13,7 +13,7 @@
 </br></br>
 
 
-## usage
+## Usage
 
 ```cpp
 #include "jobject.hpp"
@@ -25,7 +25,7 @@ auto main(void)
 }
 ```
 
-## contributing
+## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 Please make sure to update tests as appropriate.
