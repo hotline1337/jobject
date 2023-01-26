@@ -15,7 +15,15 @@
 
 ## usage
 
-![](https://i.imgur.com/es7yUAq.png)
+```cpp
+#include "jobject.hpp"
+
+auto main(void)
+{
+  jobject::init();
+  /* ... */
+}
+```
 
 ## contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
