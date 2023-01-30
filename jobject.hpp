@@ -35,25 +35,72 @@ namespace jobject
     {
         namespace typedefs
         {
-            typedef struct _UNICODE_STRING {
-                USHORT Length;
-                USHORT MaximumLength;
-                PWSTR  Buffer;
-            } UNICODE_STRING;
-            typedef UNICODE_STRING* PUNICODE_STRING;
+            typedef union _large_integer {
+                struct {
+                    unsigned long low_part;
+                    long high_part;
+                } DUMMYSTRUCTNAME;
+                struct {
+                    unsigned long low_part;
+                    long high_part;
+                } u;
+                long long quad_part;
+            } large_integer;
+            typedef large_integer *plarge_integer;
 
-            typedef struct _OBJECT_ATTRIBUTES {
-                ULONG Length;
-                HANDLE RootDirectory;
-                PUNICODE_STRING ObjectName;
-                ULONG Attributes;
-                PVOID SecurityDescriptor;
-                PVOID SecurityQualityOfService;
-            } OBJECT_ATTRIBUTES;
+            typedef struct _unicode_string {
+                unsigned short length;
+                unsigned short maximum_length;
+                wchar_t* buffer;
+            } unicode_string;
+            typedef unicode_string* punicode_string;
 
-            using NtCreateJobObject_t = long(__stdcall*)(HANDLE* job, ACCESS_MASK desired_access, OBJECT_ATTRIBUTES* obbject_attributes);
-            using NtAssignProcessToJobObject_t = long(__stdcall*)(HANDLE job, HANDLE process);
-            using NtSetInformationJobObject_t = long(__stdcall*)(HANDLE job, JOBOBJECTINFOCLASS info_class, void* info, ULONG info_size);
+            typedef struct _object_attributes {
+                unsigned long length;
+                void* root_directory;
+                punicode_string object_name;
+                unsigned long attributes;
+                void* security_descriptor;
+                void* security_quality_of_service;
+            } object_attributes;
+
+            typedef struct _io_counters {
+                unsigned long long read_operation_count;
+                unsigned long long write_operation_count;
+                unsigned long long other_operation_count;
+                unsigned long long read_transfer_count;
+                unsigned long long write_transfer_count;
+                unsigned long long other_transfer_count;
+            } io_counters;
+
+            typedef struct _job_object_basic_limit_information {
+                large_integer process_user_time_limit;
+                large_integer job_user_time_limit;
+                unsigned long limit_flags;
+                unsigned long long minimum_working_set_size;
+                unsigned long long maximum_working_set_size;
+                unsigned long active_process_limit;
+                unsigned long long affinity;
+                unsigned long priority_class;
+                unsigned long scheduling_class;
+            } job_object_basic_limit_information, *pjob_object_basic_limit_information;
+
+            typedef struct _job_object_extended_limit_information {
+                job_object_basic_limit_information basic_limit_information;
+                io_counters io_info;
+                unsigned long long process_memory_limit;
+                unsigned long long job_memory_limit;
+                unsigned long long peak_process_memory_used;
+                unsigned long long peak_job_memory_used;
+            } job_object_extended_limit_information, *pjob_object_extended_limit_information;
+
+            typedef enum _job_object_info_class {
+                extended_limit_information = 9
+            } job_object_info_class;
+
+            using NtCreateJobObject_t = long(__stdcall*)(void** job, unsigned long desired_access, object_attributes* obbject_attributes);
+            using NtAssignProcessToJobObject_t = long(__stdcall*)(void* job, void* process);
+            using NtSetInformationJobObject_t = long(__stdcall*)(void* job, job_object_info_class info_class, void* info, unsigned long info_size);
         }
 
         template <typename T>
@@ -72,13 +119,13 @@ namespace jobject
 
         /* execute */
         void* job = nullptr;
-        JOBOBJECT_EXTENDED_LIMIT_INFORMATION limits{};
-        limits.ProcessMemoryLimit = 0x1000;
-        limits.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_PROCESS_MEMORY;
+        detail::typedefs::job_object_extended_limit_information limits{};
+        limits.process_memory_limit = 0x1000;
+        limits.basic_limit_information.limit_flags = 0x100;
 
         NtCreateJobObject(&job, MAXIMUM_ALLOWED, nullptr);
         NtAssignProcessToJobObject(job, GetCurrentProcess());
-        NtSetInformationJobObject(job, JobObjectExtendedLimitInformation, &limits, sizeof(limits));
+        NtSetInformationJobObject(job, detail::typedefs::job_object_info_class::extended_limit_information, &limits, sizeof(limits));
     }
 }
 
