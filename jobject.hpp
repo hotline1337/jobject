@@ -19,6 +19,7 @@
 
 #pragma region JOBJECT_INCLUDES
 #include <libloaderapi.h>
+#include <processthreadsapi.h>
 #pragma endregion JOBJECT_INCLUDES
 
 #if defined(_MSC_VER)
